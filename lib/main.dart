@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+
+import 'blocs.dart';
+import 'models.dart';
 
 const appTitle = "HA Speak";
 
@@ -17,7 +21,14 @@ final _router = GoRouter(
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  runApp(MultiBlocProvider(
+    providers: [
+      BlocProvider(
+          create: (_) => HAConnectionBloc(HADisconnectedState())
+            ..add(ConnectionStatusEvent())),
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -87,7 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late SpeechToText _speech;
   late bool _isListening = false;
   //late BonsoirDiscovery _mdnsService;
-  String _text = 'Press the button and start speaking...';
+  String _text = 'Press the mic button and start speaking...';
 
   @override
   void initState() {
@@ -145,7 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Center(child: Text(widget.title)),
       ),
       body: Container(
-        color: Colors.blue,
+        color: Colors.white,
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
         child: Column(
@@ -165,16 +176,41 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            const Padding(
-              padding: EdgeInsets.all(18.0),
-              child: Text(
-                'You have pushed the button this many times:',
+            Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: BlocBuilder<HAConnectionBloc, HAConnectionState>(
+                builder: (context, state) {
+                  if (state is HADisconnectedState) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.yellow,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () {},
+                          child: const Text(
+                            'HA Disconnected',
+                            style: TextStyle(
+                              fontSize: 20.0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return const Text(
+                      'HA Connected',
+                    );
+                  }
+                },
               ),
             ),
             Expanded(
               child: DecoratedBox(
                 decoration: const BoxDecoration(
-                  color: Colors.green,
+                  color: Colors.white,
                 ),
                 child: Center(
                   child: Text(
