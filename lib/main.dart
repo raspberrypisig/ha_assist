@@ -5,6 +5,7 @@ import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 import 'blocs.dart';
+import 'ha.dart';
 import 'models.dart';
 
 const appTitle = "HA Speak";
@@ -13,8 +14,14 @@ const appTitle = "HA Speak";
 final _router = GoRouter(
   routes: [
     GoRoute(
+      name: 'home',
       path: '/',
       builder: (context, state) => const MainScreen(),
+    ),
+    GoRoute(
+      name: 'ha',
+      path: '/ha',
+      builder: (context, state) => const HAScreen(),
     ),
   ],
 );
@@ -189,7 +196,9 @@ class _MyHomePageState extends State<MyHomePage> {
                             backgroundColor: Colors.yellow,
                             foregroundColor: Colors.black,
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            context.goNamed('ha');
+                          },
                           child: const Text(
                             'HA Disconnected',
                             style: TextStyle(
