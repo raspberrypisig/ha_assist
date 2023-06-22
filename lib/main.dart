@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ha_assist/repository.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
@@ -21,20 +22,30 @@ final _router = GoRouter(
     GoRoute(
       name: 'ha',
       path: '/ha',
-      builder: (context, state) => const HAScreen(),
+      builder: (context, state) {
+        return const HAScreen();
+      },
     ),
   ],
 );
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MultiBlocProvider(
-    providers: [
-      BlocProvider(
-          create: (_) => HAConnectionBloc(HADisconnectedState())
-            ..add(ConnectionStatusEvent())),
-    ],
-    child: const MyApp(),
+  runApp(RepositoryProvider(
+    create: (_) => HADiscoveredRepository(),
+    child: MultiBlocProvider(
+      providers: [
+        BlocProvider(
+            create: (context) => HAConnectionBloc(
+                RepositoryProvider.of<HADiscoveredRepository>(context))
+              ..add(ConnectionsPageLoad())),
+        BlocProvider(
+            create: (context) => HADiscoveredBloc(
+                RepositoryProvider.of<HADiscoveredRepository>(context))
+              ..add(FindHAInstancesEvent())),
+      ],
+      child: const MyApp(),
+    ),
   ));
 }
 

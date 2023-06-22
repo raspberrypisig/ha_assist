@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'blocs.dart';
+import 'models.dart';
 
 class HAScreen extends StatelessWidget {
   const HAScreen({super.key});
@@ -37,7 +41,8 @@ class HAScreen extends StatelessWidget {
                     trailing: IconButton(
                         onPressed: () {},
                         icon: const Icon(Icons.navigate_next)),
-                  )
+                  ),
+                  const NewHAWidget(),
                 ],
               ),
             ),
@@ -45,5 +50,32 @@ class HAScreen extends StatelessWidget {
         ),
       ),
     ));
+  }
+}
+
+class NewHAWidget extends StatefulWidget {
+  const NewHAWidget({super.key});
+
+  @override
+  State<NewHAWidget> createState() => _NewHAWidgetState();
+}
+
+class _NewHAWidgetState extends State<NewHAWidget> {
+  @override
+  void initState() {
+    super.initState();
+    BlocProvider.of<HADiscoveredBloc>(context).add(FindHAInstancesEvent());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: BlocListener<HADiscoveredBloc, HAConnectedState>(
+        listener: (ctx, state) {
+          debugPrint(state.toString());
+        },
+        child: const Text("boo"),
+      ),
+    );
   }
 }
