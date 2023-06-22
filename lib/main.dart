@@ -121,11 +121,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _onSpeechToTextError(SpeechRecognitionError errorNotification) {
-    print(errorNotification);
+    debugPrint("$errorNotification");
   }
 
   void _onSpeechToTextStatus(String status) {
-    print(status);
+    debugPrint(status);
     if (status == "done" && _isListening) {
       startListening();
     }
@@ -243,23 +243,23 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _toggleMic() async {
     if (_speech.isAvailable) {
-      print("speech is not available");
+      debugPrint("speech is not available");
     } else {
-      print("speech not available");
+      debugPrint("speech not available");
     }
     setState(() {
       _isListening = !_isListening;
     });
-    print(
+    debugPrint(
       "Mic on: $_isListening",
     );
     if (_speech.isAvailable && _isListening) {
-      print("about to do it.");
+      debugPrint("about to do it.");
       startListening();
     }
 
     if (_speech.isAvailable && !_isListening) {
-      print("not about to do it.");
+      debugPrint("not about to do it.");
       stopListening();
     }
   }
