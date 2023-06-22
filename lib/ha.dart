@@ -64,18 +64,16 @@ class _NewHAWidgetState extends State<NewHAWidget> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<HADiscoveredBloc>(context).add(FindHAInstancesEvent());
+    //BlocProvider.of<HADiscoveredBloc>(context).add(FindHAInstancesEvent());
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: BlocListener<HADiscoveredBloc, HAConnectedState>(
-        listener: (ctx, state) {
-          debugPrint(state.toString());
-        },
-        child: const Text("boo"),
-      ),
+    return BlocListener<HADiscoveredBloc, HAConnectedState>(
+      listener: (ctx, state) {
+        print("give me something");
+      },
+      child: const Text("boo"),
     );
   }
 }

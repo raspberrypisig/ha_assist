@@ -29,6 +29,7 @@ class HADiscoveredBloc extends Bloc<DiscoveredEvent, HAConnectedState> {
       event, Emitter<HAConnectedState> emit) async {
     print("Finding HA Instances...");
     await for (final service in _repository.find()) {
+      print("please give me something");
       emit(HAConnectedState()..fromService(service));
     }
   }

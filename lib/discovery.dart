@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:bonsoir/bonsoir.dart';
 
@@ -19,11 +20,16 @@ class HAMdnsDiscovery {
 
   /// Starts the Bonsoir discovery.
   Future<void> start() async {
-    if (_bonsoirDiscovery.isStopped) {
-      _bonsoirDiscovery = BonsoirDiscovery(type: serviceType);
+    //if (!_bonsoirDiscovery.isStopped) {
+    //  _bonsoirDiscovery.stop();
+    //}
+
+    if (!_bonsoirDiscovery.isReady) {
       await _bonsoirDiscovery.ready;
-      await _bonsoirDiscovery.start();
     }
+
+    //print(_bonsoirDiscovery.isStopped);
+    await _bonsoirDiscovery.start();
 
     //if (_bonsoirDiscovery!.eventStream != null) {
     //await for (final event in _bonsoirDiscovery!.eventStream) {}
@@ -49,11 +55,38 @@ class HAMdnsDiscovery {
     return service;
   }
 
-  Stream<BonsoirDiscoveryEvent> found() async* {
-    start();
-    //yield* _bonsoirDiscovery.eventStream!.asBroadcastStream();
-    if (_bonsoirDiscovery.eventStream != null) {
-      yield* _bonsoirDiscovery.eventStream!.cast<BonsoirDiscoveryEvent>();
+  Stream<ResolvedBonsoirService> found() async* {
+    //await start();
+    if (!_bonsoirDiscovery.isReady) {
+      await _bonsoirDiscovery.ready;
+      print(_bonsoirDiscovery.isReady);
+      print(_bonsoirDiscovery.isStopped);
     }
+    final stream = _bonsoirDiscovery.eventStream;
+    if (stream != null) {
+      //yield* stream;
+
+      /*
+      stream.listen((BonsoirDiscoveryEvent event) {
+        if (event.type == BonsoirDiscoveryEventType.discoveryServiceResolved) {
+          final svc = event.service as ResolvedBonsoirService;
+          print(svc);
+        }
+      });
+      */
+
+      _bonsoirDiscovery.start();
+      await for (BonsoirDiscoveryEvent event in stream) {
+        if (event.type == BonsoirDiscoveryEventType.discoveryServiceResolved) {
+          final svc = event.service as ResolvedBonsoirService;
+          print(svc);
+          yield svc;
+        }
+      }
+
+      //await _bonsoirDiscovery.start();
+      print("started...");
+    }
+    print("exiting found...");
   }
 }

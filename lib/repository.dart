@@ -23,7 +23,9 @@ class HADiscoveredRepository {
 
   Stream<List<ResolvedBonsoirService>> find() async* {
     await for (final event in _discovery.found()) {
-      ResolvedBonsoirService? ha = _discovery.resolveHA(event);
+      print("anything?");
+      /*
+      ResolvedBonsoirService ha = _discovery.resolveHA(event);
       if (event.type == BonsoirDiscoveryEventType.discoveryServiceResolved) {
         _resolvedServices.add(ha!);
         yield List.from(_resolvedServices);
@@ -31,6 +33,7 @@ class HADiscoveredRepository {
         _resolvedServices.remove(ha);
         yield List.from(_resolvedServices);
       }
+      */
     }
   }
 }
