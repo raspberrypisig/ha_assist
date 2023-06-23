@@ -1,7 +1,8 @@
 import 'package:bonsoir/bonsoir.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:native_qr/native_qr.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'blocs.dart';
 import 'models.dart';
 
@@ -34,20 +35,6 @@ class HAScreen extends StatelessWidget {
             ),
             Flexible(
               child: NewHAWidget(),
-
-              /*ListView(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.home),
-                    title: const Text('Home'),
-                    subtitle: const Text('IP: 192.168.20.98 Port:8123'),
-                    trailing: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.navigate_next)),
-                  ),
-                  const NewHAWidget(),
-                ],
-              ),*/
             ),
           ],
         ),
@@ -65,6 +52,7 @@ class NewHAWidget extends StatefulWidget {
 
 class _NewHAWidgetState extends State<NewHAWidget> {
   List<ResolvedBonsoirService> _haInstances = [];
+  final _nativeQr = NativeQr();
 
   @override
   void initState() {
@@ -98,7 +86,15 @@ class _NewHAWidgetState extends State<NewHAWidget> {
                   title: Text(friendlyName),
                   subtitle: Text('IP: $ip Port: $port'),
                   trailing: IconButton(
-                      onPressed: () {}, icon: const Icon(Icons.navigate_next)),
+                      onPressed: () async {
+                        try {
+                          var result = await _nativeQr.get();
+                          print(result);
+                        } catch (err) {
+                          print(err);
+                        }
+                      },
+                      icon: const Icon(Icons.navigate_next)),
                 );
               }),
     );
