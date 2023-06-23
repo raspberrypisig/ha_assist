@@ -52,6 +52,7 @@ class NewHAWidget extends StatefulWidget {
 
 class _NewHAWidgetState extends State<NewHAWidget> {
   List<ResolvedBonsoirService> _haInstances = [];
+  Map<String, String> _tokens = {};
   final _nativeQr = NativeQr();
 
   @override
@@ -76,11 +77,12 @@ class _NewHAWidgetState extends State<NewHAWidget> {
           : ListView.builder(
               itemCount: _haInstances.length,
               itemBuilder: (context, index) {
-                //print(index);
+                print(_haInstances[index]);
                 String friendlyName = _haInstances[index].name;
                 String ip = _haInstances[index].ip!;
                 String port = _haInstances[index].port.toString();
-
+                String url = _haInstances[index].attributes!['base_url']!;
+                print(url);
                 return ListTile(
                   leading: const Icon(Icons.home),
                   title: Text(friendlyName),
@@ -90,6 +92,7 @@ class _NewHAWidgetState extends State<NewHAWidget> {
                         try {
                           var result = await _nativeQr.get();
                           print(result);
+                          //_tokens[url] = result!;
                         } catch (err) {
                           print(err);
                         }

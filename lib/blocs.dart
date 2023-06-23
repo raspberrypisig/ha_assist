@@ -19,6 +19,7 @@ class HAConnectionBloc extends Bloc<ConnectionStatusEvent, HAConnectionState> {
 
 class HADiscoveredBloc extends Bloc<DiscoveredEvent, HAConnectedState> {
   late HADiscoveredRepository _repository;
+  List<ResolvedBonsoirService> haservices = [];
 
   HADiscoveredBloc(HADiscoveredRepository repository)
       : super(HAConnectedState()) {
@@ -30,6 +31,7 @@ class HADiscoveredBloc extends Bloc<DiscoveredEvent, HAConnectedState> {
       event, Emitter<HAConnectedState> emit) async {
     print("Finding HA Instances...");
     await for (List<ResolvedBonsoirService> services in _repository.find()) {
+      haservices = services;
       final newState = HAConnectedState.fromList(services);
       emit(newState);
     }
