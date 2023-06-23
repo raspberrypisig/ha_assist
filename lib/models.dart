@@ -23,9 +23,13 @@ sealed class HAConnectionState {}
 final class HADisconnectedState extends HAConnectionState {}
 
 final class HAConnectedState extends HAConnectionState {
-  List<ResolvedBonsoirService> haInstances = [];
+  List<ResolvedBonsoirService> haInstances;
 
-  HAConnectedState();
+  HAConnectedState._internal() : haInstances = [];
+
+  factory HAConnectedState() {
+    return HAConnectedState._internal();
+  }
 
   void addService(ResolvedBonsoirService service) {
     haInstances.add(service);
@@ -35,7 +39,7 @@ final class HAConnectedState extends HAConnectionState {
     haInstances.remove(service);
   }
 
-  HAConnectedState fromService(List<ResolvedBonsoirService> services) {
+  factory HAConnectedState.fromList(List<ResolvedBonsoirService> services) {
     HAConnectedState newState = HAConnectedState();
     newState.haInstances = services;
     return newState;

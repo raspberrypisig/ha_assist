@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bonsoir/bonsoir.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ha_assist/models.dart';
 import 'package:ha_assist/repository.dart';
@@ -28,9 +29,9 @@ class HADiscoveredBloc extends Bloc<DiscoveredEvent, HAConnectedState> {
   FutureOr<void> _onFindHAInstances(
       event, Emitter<HAConnectedState> emit) async {
     print("Finding HA Instances...");
-    await for (final service in _repository.find()) {
-      print("please give me something");
-      emit(HAConnectedState()..fromService(service));
+    await for (List<ResolvedBonsoirService> services in _repository.find()) {
+      final newState = HAConnectedState.fromList(services);
+      emit(newState);
     }
   }
 }

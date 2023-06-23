@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:ui';
+//import 'dart:ui';
 
 import 'package:bonsoir/bonsoir.dart';
 
@@ -46,16 +46,17 @@ class HAMdnsDiscovery {
   }
 
   /// Triggered when a Bonsoir discovery event occurred.
-  ResolvedBonsoirService? resolveHA(BonsoirDiscoveryEvent event) {
+  ResolvedBonsoirService resolveHA(BonsoirDiscoveryEvent event) {
+    /*
     if (event.service == null || !event.isServiceResolved) {
       return null;
     }
-
+    */
     ResolvedBonsoirService service = event.service as ResolvedBonsoirService;
     return service;
   }
 
-  Stream<ResolvedBonsoirService> found() async* {
+  Stream<BonsoirDiscoveryEvent> found() async* {
     //await start();
     if (!_bonsoirDiscovery.isReady) {
       await _bonsoirDiscovery.ready;
@@ -80,7 +81,7 @@ class HAMdnsDiscovery {
         if (event.type == BonsoirDiscoveryEventType.discoveryServiceResolved) {
           final svc = event.service as ResolvedBonsoirService;
           print(svc);
-          yield svc;
+          yield event;
         }
       }
 

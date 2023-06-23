@@ -1,3 +1,4 @@
+import 'package:bonsoir/bonsoir.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -15,12 +16,12 @@ class HAScreen extends StatelessWidget {
         title: const Center(child: Text("Finding Home Assistant")),
         backgroundColor: const Color(0xff764abc),
       ),
-      body: SafeArea(
+      body: const SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(
                 top: 30.0,
                 bottom: 10.0,
@@ -32,7 +33,9 @@ class HAScreen extends StatelessWidget {
               ),
             ),
             Flexible(
-              child: ListView(
+              child: NewHAWidget(),
+
+              /*ListView(
                 children: [
                   ListTile(
                     leading: const Icon(Icons.home),
@@ -44,7 +47,7 @@ class HAScreen extends StatelessWidget {
                   ),
                   const NewHAWidget(),
                 ],
-              ),
+              ),*/
             ),
           ],
         ),
@@ -61,6 +64,8 @@ class NewHAWidget extends StatefulWidget {
 }
 
 class _NewHAWidgetState extends State<NewHAWidget> {
+  List<ResolvedBonsoirService> _haInstances = [];
+
   @override
   void initState() {
     super.initState();
@@ -71,9 +76,31 @@ class _NewHAWidgetState extends State<NewHAWidget> {
   Widget build(BuildContext context) {
     return BlocListener<HADiscoveredBloc, HAConnectedState>(
       listener: (ctx, state) {
-        print("give me something");
+        print("give me from bloclistener");
+        print(state);
+        print(state.haInstances);
+        setState(() {
+          _haInstances = List.from(state.haInstances);
+        });
       },
-      child: const Text("boo"),
+      child: _haInstances.isEmpty
+          ? const SizedBox.shrink()
+          : ListView.builder(
+              itemCount: _haInstances.length,
+              itemBuilder: (context, index) {
+                //print(index);
+                String friendlyName = _haInstances[index].name;
+                String ip = _haInstances[index].ip!;
+                String port = _haInstances[index].port.toString();
+
+                return ListTile(
+                  leading: const Icon(Icons.home),
+                  title: Text(friendlyName),
+                  subtitle: Text('IP: $ip Port: $port'),
+                  trailing: IconButton(
+                      onPressed: () {}, icon: const Icon(Icons.navigate_next)),
+                );
+              }),
     );
   }
 }
