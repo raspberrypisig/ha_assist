@@ -15,6 +15,12 @@ class TokenFound extends ConnectionStatusEvent {
   TokenFound(this.url, this.token);
 }
 
+class HATalk extends ConnectionStatusEvent {
+  String message;
+
+  HATalk(this.message);
+}
+
 class DiscoveredEvent {}
 
 class NewlyDiscoveredEvent extends DiscoveredEvent {}

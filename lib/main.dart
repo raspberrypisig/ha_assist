@@ -206,32 +206,33 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: const EdgeInsets.all(18.0),
               child: BlocBuilder<HAConnectionBloc, HAConnectionState>(
                 builder: (context, state) {
-                  if (state is HADisconnectedState) {
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton(
+                  bool apiAvailable = state is HAConnectedState;
+                  MaterialColor backgroundButtonColor = Colors.yellow;
+                  String text = "HA Disconnected";
+                  if (apiAvailable) {
+                    text = "HA Connected";
+                    backgroundButtonColor = Colors.green;
+                  }
+
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.yellow,
+                            backgroundColor: backgroundButtonColor,
                             foregroundColor: Colors.black,
                           ),
                           onPressed: () {
-                            context.goNamed('ha');
+                            context.pushNamed('ha');
                           },
-                          child: const Text(
-                            'HA Disconnected',
-                            style: TextStyle(
+                          child: Text(
+                            text,
+                            style: const TextStyle(
                               fontSize: 20.0,
                             ),
-                          ),
-                        ),
-                      ],
-                    );
-                  } else {
-                    return const Text(
-                      'HA Connected',
-                    );
-                  }
+                          )),
+                    ],
+                  );
                 },
               ),
             ),

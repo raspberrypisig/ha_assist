@@ -7,13 +7,29 @@ import 'package:ha_assist/harestapi.dart';
 import 'package:ha_assist/models.dart';
 import 'package:ha_assist/repository.dart';
 
+class ConnectionDetails {
+  String homeassistant;
+  String token;
+
+  ConnectionDetails(this.homeassistant, this.token);
+}
+
 class HAConnectionBloc extends Bloc<ConnectionStatusEvent, HAConnectionState> {
   final HARestAPI _haApi = HARestAPI();
+  ConnectionDetails? _connection;
 
   HAConnectionBloc(HADiscoveredRepository repository)
       : super(HADisconnectedState()) {
     on<ConnectionsPageLoad>(_onConnectionsPageLoad);
     on<TokenFound>(_onTokenFound);
+    on<HATalk>(_onHATalk);
+  }
+
+  bool get apiAvailable {
+    if (_connection != null) {
+      return true;
+    }
+    return false;
   }
 
   FutureOr<void> _onConnectionsPageLoad(
@@ -26,11 +42,16 @@ class HAConnectionBloc extends Bloc<ConnectionStatusEvent, HAConnectionState> {
     debugPrint("Token found: ${event.token} for url: ${event.url}");
     bool isRestApiAvailable = await _haApi.ping(event.url, event.token);
     if (isRestApiAvailable) {
+      _connection = ConnectionDetails(event.url, event.token);
+      emit(HAConnectedState());
       debugPrint("HA Rest API Alive");
     } else {
+      emit(HADisconnectedState());
       debugPrint("HA Rest API Not Alive");
     }
   }
+
+  FutureOr<void> _onHATalk(HATalk event, Emitter<HAConnectionState> emit) {}
 }
 
 class HADiscoveredBloc extends Bloc<DiscoveredEvent, HAConnectedState> {
