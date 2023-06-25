@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 
 class HARestAPI {
   Future<bool> ping(String haUrl, String token) async {
-    var url = Uri.parse("$haUrl/api");
+    var url = Uri.parse("$haUrl/api/");
     var response = await http.get(url, headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer $token",

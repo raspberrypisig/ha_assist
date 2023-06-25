@@ -40,9 +40,10 @@ class HAConnectionBloc extends Bloc<ConnectionStatusEvent, HAConnectionState> {
   FutureOr<void> _onTokenFound(
       TokenFound event, Emitter<HAConnectionState> emit) async {
     debugPrint("Token found: ${event.token} for url: ${event.url}");
-    bool isRestApiAvailable = await _haApi.ping(event.url, event.token);
+    var token = event.token.trim();
+    bool isRestApiAvailable = await _haApi.ping(event.url, token);
     if (isRestApiAvailable) {
-      _connection = ConnectionDetails(event.url, event.token);
+      _connection = ConnectionDetails(event.url, token);
       emit(HAConnectedState());
       debugPrint("HA Rest API Alive");
     } else {
