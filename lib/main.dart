@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ha_assist/camera.dart';
 import 'package:ha_assist/repository.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_to_text.dart';
@@ -24,6 +25,13 @@ final _router = GoRouter(
       path: '/ha',
       builder: (context, state) {
         return const HAScreen();
+      },
+    ),
+    GoRoute(
+      name: 'qrcamera',
+      path: '/qrcamera/:haurl',
+      builder: (context, state) {
+        return QrCameraScreen(haUrl: state.pathParameters['haurl']);
       },
     ),
   ],

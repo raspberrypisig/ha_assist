@@ -42,7 +42,6 @@ dependencies:
   bonsoir: ^2.2.0+1
   flutter_native_splash: ^2.3.1
   equatable: ^2.0.5
-  native_qr: ^0.0.3
   mobile_scanner: ^3.2.0
 
 dev_dependencies:

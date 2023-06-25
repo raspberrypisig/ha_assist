@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bonsoir/bonsoir.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ha_assist/models.dart';
 import 'package:ha_assist/repository.dart';
@@ -9,11 +10,17 @@ class HAConnectionBloc extends Bloc<ConnectionStatusEvent, HAConnectionState> {
   HAConnectionBloc(HADiscoveredRepository repository)
       : super(HADisconnectedState()) {
     on<ConnectionsPageLoad>(_onConnectionsPageLoad);
+    on<TokenFound>(_onTokenFound);
   }
 
   FutureOr<void> _onConnectionsPageLoad(
       ConnectionStatusEvent event, Emitter<HAConnectionState> emit) {
     emit(HADisconnectedState());
+  }
+
+  FutureOr<void> _onTokenFound(
+      TokenFound event, Emitter<HAConnectionState> emit) {
+    debugPrint("Token found: ${event.token} for url: ${event.url}");
   }
 }
 

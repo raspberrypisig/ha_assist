@@ -1,8 +1,7 @@
 import 'package:bonsoir/bonsoir.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:native_qr/native_qr.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:go_router/go_router.dart';
 import 'blocs.dart';
 import 'models.dart';
 
@@ -53,7 +52,6 @@ class NewHAWidget extends StatefulWidget {
 class _NewHAWidgetState extends State<NewHAWidget> {
   List<ResolvedBonsoirService> _haInstances = [];
   Map<String, String> _tokens = {};
-  final _nativeQr = NativeQr();
 
   @override
   void initState() {
@@ -88,14 +86,9 @@ class _NewHAWidgetState extends State<NewHAWidget> {
                   title: Text(friendlyName),
                   subtitle: Text('IP: $ip Port: $port'),
                   trailing: IconButton(
-                      onPressed: () async {
-                        try {
-                          var result = await _nativeQr.get();
-                          print(result);
-                          //_tokens[url] = result!;
-                        } catch (err) {
-                          print(err);
-                        }
+                      onPressed: () {
+                        context.goNamed('qrcamera',
+                            pathParameters: {'haurl': url});
                       },
                       icon: const Icon(Icons.navigate_next)),
                 );

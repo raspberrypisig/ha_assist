@@ -8,6 +8,13 @@ class ConnectionStatusEvent {}
 
 class ConnectionsPageLoad extends ConnectionStatusEvent {}
 
+class TokenFound extends ConnectionStatusEvent {
+  String token;
+  String url;
+
+  TokenFound(this.url, this.token);
+}
+
 class DiscoveredEvent {}
 
 class NewlyDiscoveredEvent extends DiscoveredEvent {}
