@@ -3,10 +3,13 @@ import 'dart:async';
 import 'package:bonsoir/bonsoir.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ha_assist/harestapi.dart';
 import 'package:ha_assist/models.dart';
 import 'package:ha_assist/repository.dart';
 
 class HAConnectionBloc extends Bloc<ConnectionStatusEvent, HAConnectionState> {
+  final HARestAPI _haApi = HARestAPI();
+
   HAConnectionBloc(HADiscoveredRepository repository)
       : super(HADisconnectedState()) {
     on<ConnectionsPageLoad>(_onConnectionsPageLoad);
@@ -19,8 +22,14 @@ class HAConnectionBloc extends Bloc<ConnectionStatusEvent, HAConnectionState> {
   }
 
   FutureOr<void> _onTokenFound(
-      TokenFound event, Emitter<HAConnectionState> emit) {
+      TokenFound event, Emitter<HAConnectionState> emit) async {
     debugPrint("Token found: ${event.token} for url: ${event.url}");
+    bool isRestApiAvailable = await _haApi.ping(event.url, event.token);
+    if (isRestApiAvailable) {
+      debugPrint("HA Rest API Alive");
+    } else {
+      debugPrint("HA Rest API Not Alive");
+    }
   }
 }
 

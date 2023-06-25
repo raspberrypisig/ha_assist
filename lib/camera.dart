@@ -8,7 +8,8 @@ import 'models.dart';
 
 class QrCameraScreen extends StatelessWidget {
   final String? haUrl;
-  const QrCameraScreen({super.key, this.haUrl});
+  QrCameraScreen({super.key, this.haUrl});
+  final controller = MobileScannerController(returnImage: false);
 
   @override
   Widget build(BuildContext context) {
@@ -16,17 +17,14 @@ class QrCameraScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Mobile Scanner')),
       body: MobileScanner(
         fit: BoxFit.contain,
-        controller: MobileScannerController(
-          // facing: CameraFacing.back,
-          // torchEnabled: false,
-          returnImage: false,
-        ),
+        controller: controller,
         onDetect: (capture) {
           final List<Barcode> barcodes = capture.barcodes;
           for (final barcode in barcodes) {
             debugPrint('Barcode found! ${barcode.rawValue}');
             BlocProvider.of<HAConnectionBloc>(context)
                 .add(TokenFound(haUrl!, barcode.rawValue ?? ''));
+            controller.stop();
             context.goNamed('home');
           }
         },
