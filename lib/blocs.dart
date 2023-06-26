@@ -52,7 +52,14 @@ class HAConnectionBloc extends Bloc<ConnectionStatusEvent, HAConnectionState> {
     }
   }
 
-  FutureOr<void> _onHATalk(HATalk event, Emitter<HAConnectionState> emit) {}
+  FutureOr<void> _onHATalk(
+      HATalk event, Emitter<HAConnectionState> emit) async {
+    if (apiAvailable) {
+      String result = await _haApi.talkToHA(
+          _connection!.homeassistant, _connection!.token, event.message);
+      debugPrint(result);
+    }
+  }
 }
 
 class HADiscoveredBloc extends Bloc<DiscoveredEvent, HAConnectedState> {
@@ -67,7 +74,6 @@ class HADiscoveredBloc extends Bloc<DiscoveredEvent, HAConnectedState> {
 
   FutureOr<void> _onFindHAInstances(
       event, Emitter<HAConnectedState> emit) async {
-    print("Finding HA Instances...");
     await for (List<ResolvedBonsoirService> services in _repository.find()) {
       haservices = services;
       final newState = HAConnectedState.fromList(services);

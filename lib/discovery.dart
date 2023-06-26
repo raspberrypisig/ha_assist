@@ -60,8 +60,6 @@ class HAMdnsDiscovery {
     //await start();
     if (!_bonsoirDiscovery.isReady) {
       await _bonsoirDiscovery.ready;
-      print(_bonsoirDiscovery.isReady);
-      print(_bonsoirDiscovery.isStopped);
     }
     final stream = _bonsoirDiscovery.eventStream;
     if (stream != null) {
@@ -79,15 +77,11 @@ class HAMdnsDiscovery {
       _bonsoirDiscovery.start();
       await for (BonsoirDiscoveryEvent event in stream) {
         if (event.type == BonsoirDiscoveryEventType.discoveryServiceResolved) {
-          final svc = event.service as ResolvedBonsoirService;
-          print(svc);
           yield event;
         }
       }
 
       //await _bonsoirDiscovery.start();
-      print("started...");
     }
-    print("exiting found...");
   }
 }

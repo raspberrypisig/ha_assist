@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 
 class HARestAPI {
@@ -14,9 +16,13 @@ class HARestAPI {
   }
 
   Future<String> talkToHA(String haUrl, String token, String message) async {
-    var url = Uri.parse(haUrl);
+    var url = Uri.parse("$haUrl/api/services/conversation/process");
     var response = await http.post(url,
-        headers: {'Content-Type': 'application/json'}, body: {"text": message});
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({"text": message}));
     return response.body;
   }
 }

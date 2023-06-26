@@ -51,7 +51,6 @@ class NewHAWidget extends StatefulWidget {
 
 class _NewHAWidgetState extends State<NewHAWidget> {
   List<ResolvedBonsoirService> _haInstances = [];
-  Map<String, String> _tokens = {};
 
   @override
   void initState() {
@@ -63,9 +62,6 @@ class _NewHAWidgetState extends State<NewHAWidget> {
   Widget build(BuildContext context) {
     return BlocListener<HADiscoveredBloc, HAConnectedState>(
       listener: (ctx, state) {
-        print("give me from bloclistener");
-        print(state);
-        print(state.haInstances);
         setState(() {
           _haInstances = List.from(state.haInstances);
         });
@@ -75,12 +71,10 @@ class _NewHAWidgetState extends State<NewHAWidget> {
           : ListView.builder(
               itemCount: _haInstances.length,
               itemBuilder: (context, index) {
-                print(_haInstances[index]);
                 String friendlyName = _haInstances[index].name;
                 String ip = _haInstances[index].ip!;
                 String port = _haInstances[index].port.toString();
                 String url = _haInstances[index].attributes!['base_url']!;
-                print(url);
                 return ListTile(
                   leading: const Icon(Icons.home),
                   title: Text(friendlyName),

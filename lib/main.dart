@@ -152,9 +152,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> startListening() async {
     await _speech.listen(onResult: (result) {
+      debugPrint(result.recognizedWords);
       setState(() {
         _text = result.recognizedWords;
       });
+      if (result.recognizedWords != "") {
+        BlocProvider.of<HAConnectionBloc>(context)
+            .add(HATalk(result.recognizedWords));
+      }
     });
   }
 
