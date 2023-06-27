@@ -15,14 +15,19 @@ class ConnectionDetails {
 }
 
 class HAConnectionBloc extends Bloc<ConnectionStatusEvent, HAConnectionState> {
+  late HADiscoveredRepository _repository;
   final HARestAPI _haApi = HARestAPI();
   ConnectionDetails? _connection;
+  List<ResolvedBonsoirService> _discovered = [];
+  List<ConnectionDetails> _previous = [];
 
   HAConnectionBloc(HADiscoveredRepository repository)
       : super(HADisconnectedState()) {
+    _repository = repository;
     on<ConnectionsPageLoad>(_onConnectionsPageLoad);
     on<TokenFound>(_onTokenFound);
     on<HATalk>(_onHATalk);
+    on<FindHAInstancesEvent>(_onFindHAInstances);
   }
 
   bool get apiAvailable {
@@ -44,7 +49,7 @@ class HAConnectionBloc extends Bloc<ConnectionStatusEvent, HAConnectionState> {
     bool isRestApiAvailable = await _haApi.ping(event.url, token);
     if (isRestApiAvailable) {
       _connection = ConnectionDetails(event.url, token);
-      emit(HAConnectedState());
+      emit(HADiscoveredState());
       debugPrint("HA Rest API Alive");
     } else {
       emit(HADisconnectedState());
@@ -60,23 +65,12 @@ class HAConnectionBloc extends Bloc<ConnectionStatusEvent, HAConnectionState> {
       debugPrint(result);
     }
   }
-}
-
-class HADiscoveredBloc extends Bloc<DiscoveredEvent, HAConnectedState> {
-  late HADiscoveredRepository _repository;
-  List<ResolvedBonsoirService> haservices = [];
-
-  HADiscoveredBloc(HADiscoveredRepository repository)
-      : super(HAConnectedState()) {
-    _repository = repository;
-    on<FindHAInstancesEvent>(_onFindHAInstances);
-  }
 
   FutureOr<void> _onFindHAInstances(
-      event, Emitter<HAConnectedState> emit) async {
+      FindHAInstancesEvent event, Emitter<HAConnectionState> emit) async {
     await for (List<ResolvedBonsoirService> services in _repository.find()) {
-      haservices = services;
-      final newState = HAConnectedState.fromList(services);
+      _discovered = services;
+      final newState = HADiscoveredState.fromList(services);
       emit(newState);
     }
   }

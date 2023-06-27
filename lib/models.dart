@@ -27,7 +27,8 @@ class NewlyDiscoveredEvent extends DiscoveredEvent {}
 
 class PreviouslyDiscoveredEvent extends DiscoveredEvent {}
 
-class FindHAInstancesEvent extends DiscoveredEvent {}
+//class FindHAInstancesEvent extends DiscoveredEvent {}
+class FindHAInstancesEvent extends ConnectionStatusEvent {}
 
 //STATE
 
@@ -35,13 +36,13 @@ sealed class HAConnectionState {}
 
 final class HADisconnectedState extends HAConnectionState {}
 
-final class HAConnectedState extends HAConnectionState {
+final class HADiscoveredState extends HAConnectionState {
   List<ResolvedBonsoirService> haInstances;
 
-  HAConnectedState._internal() : haInstances = [];
+  HADiscoveredState._internal() : haInstances = [];
 
-  factory HAConnectedState() {
-    return HAConnectedState._internal();
+  factory HADiscoveredState() {
+    return HADiscoveredState._internal();
   }
 
   void addService(ResolvedBonsoirService service) {
@@ -52,8 +53,8 @@ final class HAConnectedState extends HAConnectionState {
     haInstances.remove(service);
   }
 
-  factory HAConnectedState.fromList(List<ResolvedBonsoirService> services) {
-    HAConnectedState newState = HAConnectedState();
+  factory HADiscoveredState.fromList(List<ResolvedBonsoirService> services) {
+    HADiscoveredState newState = HADiscoveredState();
     newState.haInstances = services;
     return newState;
   }

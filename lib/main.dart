@@ -48,9 +48,8 @@ Future<void> main() async {
                 RepositoryProvider.of<HADiscoveredRepository>(context))
               ..add(ConnectionsPageLoad())),
         BlocProvider(
-            create: (context) => HADiscoveredBloc(
-                RepositoryProvider.of<HADiscoveredRepository>(context))
-              ..add(FindHAInstancesEvent())),
+            create: (context) => HAConnectionBloc(
+                RepositoryProvider.of<HADiscoveredRepository>(context))),
       ],
       child: const MyApp(),
     ),
@@ -211,7 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: const EdgeInsets.all(18.0),
               child: BlocBuilder<HAConnectionBloc, HAConnectionState>(
                 builder: (context, state) {
-                  bool apiAvailable = state is HAConnectedState;
+                  bool apiAvailable = state is HADiscoveredState;
                   MaterialColor backgroundButtonColor = Colors.yellow;
                   String text = "HA Disconnected";
                   if (apiAvailable) {
