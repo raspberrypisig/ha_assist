@@ -6,12 +6,15 @@ import 'package:bonsoir/bonsoir.dart';
 class HAMdnsDiscovery {
   final String serviceType = '_home-assistant._tcp';
   late BonsoirDiscovery _bonsoirDiscovery;
+  StreamSubscription<BonsoirDiscoveryEvent>? _subscription;
+  late void Function(BonsoirDiscoveryEvent) _onListenCallback;
 
   /// The subscription object.
   //StreamSubscription<BonsoirDiscoveryEvent>? _subscription;
 
-  HAMdnsDiscovery() {
+  HAMdnsDiscovery(void Function(BonsoirDiscoveryEvent) callback) {
     _bonsoirDiscovery = BonsoirDiscovery(type: serviceType);
+    _onListenCallback = callback;
   }
 
   /// Returns all discovered (and resolved) services.
@@ -23,11 +26,13 @@ class HAMdnsDiscovery {
     //if (!_bonsoirDiscovery.isStopped) {
     //  _bonsoirDiscovery.stop();
     //}
+    _bonsoirDiscovery = BonsoirDiscovery(type: serviceType);
 
     if (!_bonsoirDiscovery.isReady) {
       await _bonsoirDiscovery.ready;
     }
 
+    _subscription = _bonsoirDiscovery.eventStream!.listen(_onListenCallback);
     //print(_bonsoirDiscovery.isStopped);
     await _bonsoirDiscovery.start();
 
@@ -40,8 +45,8 @@ class HAMdnsDiscovery {
 
   /// Stops the Bonsoir discovery.
   void stop() {
-    //_subscription?.cancel();
-    //_subscription = null;
+    _subscription?.cancel();
+    _subscription = null;
     _bonsoirDiscovery.stop();
   }
 
@@ -61,12 +66,12 @@ class HAMdnsDiscovery {
     if (!_bonsoirDiscovery.isReady) {
       await _bonsoirDiscovery.ready;
     }
-    final stream = _bonsoirDiscovery.eventStream;
-    if (stream != null) {
+
+    if (_subscription != null) {
       //yield* stream;
 
       /*
-      stream.listen((BonsoirDiscoveryEvent event) {
+      _subscription.listen((BonsoirDiscoveryEvent event) {
         if (event.type == BonsoirDiscoveryEventType.discoveryServiceResolved) {
           final svc = event.service as ResolvedBonsoirService;
           print(svc);
@@ -74,12 +79,12 @@ class HAMdnsDiscovery {
       });
       */
 
-      _bonsoirDiscovery.start();
-      await for (BonsoirDiscoveryEvent event in stream) {
-        if (event.type == BonsoirDiscoveryEventType.discoveryServiceResolved) {
-          yield event;
-        }
-      }
+      //_bonsoirDiscovery.start();
+      //await for (BonsoirDiscoveryEvent event in stream) {
+      //  if (event.type == BonsoirDiscoveryEventType.discoveryServiceResolved) {
+      //    yield event;
+      //  }
+      //}
 
       //await _bonsoirDiscovery.start();
     }

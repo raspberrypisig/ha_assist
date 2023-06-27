@@ -102,7 +102,7 @@ class _NewHAWidgetState extends State<NewHAWidget> {
   @override
   void initState() {
     super.initState();
-    //BlocProvider.of<HADiscoveredBloc>(context).add(FindHAInstancesEvent());
+    BlocProvider.of<HAConnectionBloc>(context).add(FindHAInstancesEvent());
     //TODO: BlocProvider.of<HADiscoveredBloc>(context).add(RestoreNewlyDiscoveredEvent());
   }
 

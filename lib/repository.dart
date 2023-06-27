@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:bonsoir/bonsoir.dart';
+import 'package:flutter/foundation.dart';
 import 'package:ha_assist/discovery.dart';
 
 class HADiscoveredRepository {
@@ -10,7 +13,7 @@ class HADiscoveredRepository {
   final Map<String, String> tokens = {};
 
   HADiscoveredRepository() {
-    _discovery = HAMdnsDiscovery();
+    _discovery = HAMdnsDiscovery((BonsoirDiscoveryEvent event) {});
   }
 
   void start() {
@@ -22,20 +25,18 @@ class HADiscoveredRepository {
   }
 
   Stream<List<ResolvedBonsoirService>> find() async* {
-    await for (final event in _discovery.found()) {
-      ResolvedBonsoirService ha = _discovery.resolveHA(event);
-      _resolvedServices.add(ha);
-      yield _resolvedServices;
-      /*
-      ResolvedBonsoirService ha = _discovery.resolveHA(event);
+    StreamController<List<ResolvedBonsoirService>> streamController =
+        StreamController();
+    _discovery = HAMdnsDiscovery((BonsoirDiscoveryEvent event) {
       if (event.type == BonsoirDiscoveryEventType.discoveryServiceResolved) {
-        _resolvedServices.add(ha!);
-        yield List.from(_resolvedServices);
+        ResolvedBonsoirService ha = _discovery.resolveHA(event);
+        _resolvedServices.add(ha);
+        streamController.add(_resolvedServices);
       } else if (event.type == BonsoirDiscoveryEventType.discoveryServiceLost) {
-        _resolvedServices.remove(ha);
-        yield List.from(_resolvedServices);
+        debugPrint("${event.service?.name} lost");
       }
-      */
-    }
+    });
+    _discovery.start();
+    yield* streamController.stream;
   }
 }

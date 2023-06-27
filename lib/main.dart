@@ -47,9 +47,6 @@ Future<void> main() async {
             create: (context) => HAConnectionBloc(
                 RepositoryProvider.of<HADiscoveredRepository>(context))
               ..add(ConnectionsPageLoad())),
-        BlocProvider(
-            create: (context) => HAConnectionBloc(
-                RepositoryProvider.of<HADiscoveredRepository>(context))),
       ],
       child: const MyApp(),
     ),
