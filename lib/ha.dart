@@ -16,16 +16,14 @@ class HAScreen extends StatelessWidget {
       //     title: const Center(child: Text("Finding Home Assistant")),
       //     backgroundColor: const Color(0xff764abc),
       //   ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Flexible(
-              child: HAInstancesWidget(),
-            ),
-          ],
-        ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Flexible(
+            child: HAInstancesWidget(),
+          ),
+        ],
       ),
     ));
   }

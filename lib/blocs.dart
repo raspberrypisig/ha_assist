@@ -70,7 +70,9 @@ class HAConnectionBloc extends Bloc<ConnectionStatusEvent, HAConnectionState> {
       FindHAInstancesEvent event, Emitter<HAConnectionState> emit) async {
     await for (ResolvedBonsoirService service in _repository.find()) {
       _discovered.add(service);
-      _discovered.toSet().toList();
+      final ids = Set();
+      _discovered.retainWhere((x) => ids.add(x.attributes!['base_url']));
+
       final newState = HADiscoveredState.fromList(_discovered);
       emit(newState);
     }
