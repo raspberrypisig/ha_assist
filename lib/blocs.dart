@@ -68,9 +68,10 @@ class HAConnectionBloc extends Bloc<ConnectionStatusEvent, HAConnectionState> {
 
   FutureOr<void> _onFindHAInstances(
       FindHAInstancesEvent event, Emitter<HAConnectionState> emit) async {
-    await for (List<ResolvedBonsoirService> services in _repository.find()) {
-      _discovered = services;
-      final newState = HADiscoveredState.fromList(services);
+    await for (ResolvedBonsoirService service in _repository.find()) {
+      _discovered.add(service);
+      _discovered.toSet().toList();
+      final newState = HADiscoveredState.fromList(_discovered);
       emit(newState);
     }
   }

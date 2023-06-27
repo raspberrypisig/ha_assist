@@ -24,14 +24,14 @@ class HADiscoveredRepository {
     _discovery.stop();
   }
 
-  Stream<List<ResolvedBonsoirService>> find() async* {
-    StreamController<List<ResolvedBonsoirService>> streamController =
+  Stream<ResolvedBonsoirService> find() async* {
+    StreamController<ResolvedBonsoirService> streamController =
         StreamController();
     _discovery = HAMdnsDiscovery((BonsoirDiscoveryEvent event) {
       if (event.type == BonsoirDiscoveryEventType.discoveryServiceResolved) {
         ResolvedBonsoirService ha = _discovery.resolveHA(event);
-        _resolvedServices.add(ha);
-        streamController.add(_resolvedServices);
+        //_resolvedServices.add(ha);
+        streamController.add(ha);
       } else if (event.type == BonsoirDiscoveryEventType.discoveryServiceLost) {
         debugPrint("${event.service?.name} lost");
       }
