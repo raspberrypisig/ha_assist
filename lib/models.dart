@@ -34,6 +34,26 @@ class FindHAInstancesEvent extends ConnectionStatusEvent {}
 
 sealed class HAConnectionState {}
 
+class HAState extends HAConnectionState {
+  ConnectionDetails? connection;
+  final List<ResolvedBonsoirService> discovered = [];
+  final List<ConnectionDetails> previous = [];
+
+  bool get apiAvailable {
+    if (connection != null) {
+      return true;
+    }
+    return false;
+  }
+}
+
+class ConnectionDetails {
+  String homeassistant;
+  String token;
+
+  ConnectionDetails(this.homeassistant, this.token);
+}
+
 final class HADisconnectedState extends HAConnectionState {}
 
 final class HADiscoveredState extends HAConnectionState {
