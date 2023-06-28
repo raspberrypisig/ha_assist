@@ -36,8 +36,11 @@ sealed class HAConnectionState {}
 
 class HAState extends HAConnectionState {
   ConnectionDetails? connection;
-  final List<ResolvedBonsoirService> discovered = [];
-  final List<ConnectionDetails> previous = [];
+  late List<ResolvedBonsoirService> discovered;
+  late List<ConnectionDetails> previous;
+
+  HAState(
+      {this.connection, this.discovered = const [], this.previous = const []});
 
   bool get apiAvailable {
     if (connection != null) {
@@ -45,6 +48,31 @@ class HAState extends HAConnectionState {
     }
     return false;
   }
+
+  void addDiscoveredService(ResolvedBonsoirService service) {
+    discovered.add(service);
+  }
+
+  void connectionDetails(String url, String token) {
+    connection = ConnectionDetails(url, token);
+  }
+
+  HAState clone() {
+    return HAState(
+        connection: connection, discovered: discovered, previous: previous);
+  }
+
+  /*
+  HAState copyWith(
+      {ConnectionDetails? connection,
+      List<ResolvedBonsoirService>? discovered,
+      List<ConnectionDetails>? previous}) {
+    return HAState(
+        connection: connection ?? this.connection,
+        discovered: discovered ?? this.discovered,
+        previous: previous ?? this.previous);
+  }
+  */
 }
 
 class ConnectionDetails {

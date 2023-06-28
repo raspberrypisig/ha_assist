@@ -7,9 +7,6 @@ import 'package:ha_assist/discovery.dart';
 class HADiscoveredRepository {
   late HAMdnsDiscovery _discovery;
 
-  /// Contains all discovered (and resolved) services.
-  final List<ResolvedBonsoirService> _resolvedServices = [];
-
   final Map<String, String> tokens = {};
 
   HADiscoveredRepository() {

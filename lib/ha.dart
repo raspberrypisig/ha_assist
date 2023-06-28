@@ -108,11 +108,10 @@ class _NewHAWidgetState extends State<NewHAWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<HAConnectionBloc, HAConnectionState>(
+    return BlocListener<HAConnectionBloc, HAState>(
       listener: (ctx, state) {
         setState(() {
-          var discovered = state as HADiscoveredState;
-          _haInstances = List.from(discovered.haInstances);
+          _haInstances = state.discovered;
         });
       },
       child: _haInstances.isEmpty

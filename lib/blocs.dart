@@ -1,19 +1,20 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:bonsoir/bonsoir.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+//import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ha_assist/harestapi.dart';
 import 'package:ha_assist/models.dart';
 import 'package:ha_assist/repository.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 
-class HAConnectionBloc extends Bloc<ConnectionStatusEvent, HAConnectionState> {
+class HAConnectionBloc extends HydratedBloc<ConnectionStatusEvent, HAState> {
   late HADiscoveredRepository _repository;
   final HARestAPI _haApi = HARestAPI();
-  final HAState _state = HAState();
+  //final HAState _state = HAState();
 
-  HAConnectionBloc(HADiscoveredRepository repository)
-      : super(HADisconnectedState()) {
+  HAConnectionBloc(HADiscoveredRepository repository) : super(HAState()) {
     _repository = repository;
     on<ConnectionsPageLoad>(_onConnectionsPageLoad);
     on<TokenFound>(_onTokenFound);
@@ -23,7 +24,7 @@ class HAConnectionBloc extends Bloc<ConnectionStatusEvent, HAConnectionState> {
 
   FutureOr<void> _onConnectionsPageLoad(
       ConnectionStatusEvent event, Emitter<HAConnectionState> emit) {
-    emit(HADisconnectedState());
+    emit(state);
   }
 
   FutureOr<void> _onTokenFound(
@@ -32,20 +33,19 @@ class HAConnectionBloc extends Bloc<ConnectionStatusEvent, HAConnectionState> {
     var token = event.token.trim();
     bool isRestApiAvailable = await _haApi.ping(event.url, token);
     if (isRestApiAvailable) {
-      _state.connection = ConnectionDetails(event.url, token);
-      emit(HADiscoveredState());
+      state.connectionDetails(event.url, token);
+      emit(state);
       debugPrint("HA Rest API Alive");
     } else {
-      emit(HADisconnectedState());
       debugPrint("HA Rest API Not Alive");
     }
   }
 
   FutureOr<void> _onHATalk(
       HATalk event, Emitter<HAConnectionState> emit) async {
-    if (_state.apiAvailable) {
-      String result = await _haApi.talkToHA(_state.connection!.homeassistant,
-          _state.connection!.token, event.message);
+    if (state.apiAvailable) {
+      String result = await _haApi.talkToHA(state.connection!.homeassistant,
+          state.connection!.token, event.message);
       debugPrint(result);
     }
   }
@@ -53,11 +53,25 @@ class HAConnectionBloc extends Bloc<ConnectionStatusEvent, HAConnectionState> {
   FutureOr<void> _onFindHAInstances(
       FindHAInstancesEvent event, Emitter<HAConnectionState> emit) async {
     await for (ResolvedBonsoirService service in _repository.find()) {
-      _state.discovered.add(service);
-      final ids = Set();
-      _state.discovered.retainWhere((x) => ids.add(x.attributes!['base_url']));
-      final newState = HADiscoveredState.fromList(_state.discovered);
-      emit(newState);
+      final ids = <String?>{};
+      List<ResolvedBonsoirService> discovered = List.from(state.discovered);
+      discovered.add(service);
+      discovered.retainWhere((x) => ids.add(x.attributes!['base_url']));
+      state.discovered = discovered;
+      emit(state.clone());
     }
+  }
+
+  @override
+  HAState? fromJson(Map<String, dynamic> json) {
+    return HAState(previous: json['previous']);
+  }
+
+  @override
+  Map<String, dynamic>? toJson(HAState state) {
+    List<ConnectionDetails> previous = List.from(state.previous);
+    final ids = <ConnectionDetails>{};
+    previous.retainWhere((x) => ids.add(x));
+    return {'previous': jsonEncode(previous)};
   }
 }
