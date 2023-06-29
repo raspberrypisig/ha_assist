@@ -12,7 +12,6 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 class HAConnectionBloc extends HydratedBloc<ConnectionStatusEvent, HAState> {
   late HADiscoveredRepository _repository;
   final HARestAPI _haApi = HARestAPI();
-  //final HAState _state = HAState();
 
   HAConnectionBloc(HADiscoveredRepository repository) : super(HAState()) {
     _repository = repository;
@@ -34,7 +33,7 @@ class HAConnectionBloc extends HydratedBloc<ConnectionStatusEvent, HAState> {
     bool isRestApiAvailable = await _haApi.ping(event.url, token);
     if (isRestApiAvailable) {
       state.connectionDetails(event.url, token);
-      emit(state);
+      emit(state.clone());
       debugPrint("HA Rest API Alive");
     } else {
       debugPrint("HA Rest API Not Alive");
@@ -64,12 +63,21 @@ class HAConnectionBloc extends HydratedBloc<ConnectionStatusEvent, HAState> {
 
   @override
   HAState? fromJson(Map<String, dynamic> json) {
-    return HAState(previous: json['previous']);
+    if (json["previous"] == null) {
+      return HAState();
+    }
+    final boo = json["previous"].map((x) => ConnectionDetails.fromJson(x));
+    List<ConnectionDetails> z = List<ConnectionDetails>.from(jsonDecode(boo));
+    return HAState(previous: z);
   }
 
   @override
   Map<String, dynamic>? toJson(HAState state) {
     List<ConnectionDetails> previous = List.from(state.previous);
+    var connection = state.connection;
+    if (connection != null) {
+      previous.add(connection);
+    }
     final ids = <ConnectionDetails>{};
     previous.retainWhere((x) => ids.add(x));
     return {'previous': jsonEncode(previous)};

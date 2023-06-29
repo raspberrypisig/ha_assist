@@ -1,3 +1,5 @@
+//import 'dart:convert';
+
 import 'package:bonsoir/bonsoir.dart';
 //import 'package:equatable/equatable.dart';
 
@@ -80,6 +82,15 @@ class ConnectionDetails {
   String token;
 
   ConnectionDetails(this.homeassistant, this.token);
+
+  ConnectionDetails.fromJson(Map<String, dynamic> json)
+      : homeassistant = json['homeassistant'],
+        token = json['token'];
+
+  Map<String, dynamic> toJson() => {
+        'homeassistant': homeassistant,
+        'token': token,
+      };
 }
 
 final class HADisconnectedState extends HAConnectionState {}
