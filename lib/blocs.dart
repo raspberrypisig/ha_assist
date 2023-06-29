@@ -66,14 +66,9 @@ class HAConnectionBloc extends HydratedBloc<ConnectionStatusEvent, HAState> {
     if (json["previous"] == null) {
       return HAState();
     }
-    List<Map<String, dynamic>> dynamicJson =
-        List<Map<String, dynamic>>.from(jsonDecode(json["previous"]));
-
-    final prev = dynamicJson
-        .map((x) => ConnectionDetails(x['homeassistant'], x['token']));
-
+    final prev = List<Map<String, dynamic>>.from(jsonDecode(json["previous"]))
+        .map((x) => ConnectionDetails.fromJson(x));
     List<ConnectionDetails> previous = List<ConnectionDetails>.from(prev);
-
     return HAState(previous: previous);
   }
 
