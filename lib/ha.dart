@@ -36,19 +36,24 @@ class HAInstancesWidget extends StatefulWidget {
   State<HAInstancesWidget> createState() => _HAInstancesWidgetState();
 }
 
-class _HAInstancesWidgetState extends State<HAInstancesWidget>
-    with TickerProviderStateMixin {
-  late final TabController _tabController;
+class _HAInstancesWidgetState extends State<HAInstancesWidget> {
+  //late final TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    // _tabController = TabController(length: 3, vsync: this);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(seconds: 3), () {
+        BlocProvider.of<HAConnectionBloc>(context).add(FindHAInstancesEvent());
+      });
+    });
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    //_tabController.dispose();
     super.dispose();
   }
 
@@ -58,33 +63,34 @@ class _HAInstancesWidgetState extends State<HAInstancesWidget>
       appBar: AppBar(
         title: const Text("Finding Home Assistant"),
         backgroundColor: const Color(0xff764abc),
-        bottom: TabBar(
-            controller: _tabController,
-            indicatorColor: Colors.amberAccent,
-            indicatorWeight: 8,
-            tabs: const [
-              Tab(
-                text: "NEW",
-              ),
-              Tab(
-                text: "PREVIOUS",
-              ),
-              Tab(
-                text: "CONNECTED",
-              ),
-            ]),
       ),
-      body: TabBarView(controller: _tabController, children: const [
-        Center(
-          child: NewHAWidget(),
+      body: const SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+                child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 28.0, horizontal: 18.0),
+              child: Text(
+                "New",
+                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600),
+              ),
+            )),
+            NewHAWidget(),
+            Flexible(
+                child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 18.0),
+              child: Text(
+                "Previous",
+                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600),
+              ),
+            ))
+          ],
         ),
-        Center(
-          child: PreviousHAWidget(),
-        ),
-        Center(
-          child: ConnectedHAWidget(),
-        ),
-      ]),
+      ),
     );
   }
 }
@@ -102,8 +108,6 @@ class _NewHAWidgetState extends State<NewHAWidget> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<HAConnectionBloc>(context).add(FindHAInstancesEvent());
-    //TODO: BlocProvider.of<HADiscoveredBloc>(context).add(RestoreNewlyDiscoveredEvent());
   }
 
   @override
@@ -114,27 +118,30 @@ class _NewHAWidgetState extends State<NewHAWidget> {
           _haInstances = state.discovered;
         });
       },
-      child: _haInstances.isEmpty
+      child: (_haInstances.length == 0)
           ? const SizedBox.shrink()
-          : ListView.builder(
-              itemCount: _haInstances.length,
-              itemBuilder: (context, index) {
-                String friendlyName = _haInstances[index].name;
-                String ip = _haInstances[index].ip!;
-                String port = _haInstances[index].port.toString();
-                String url = _haInstances[index].attributes!['base_url']!;
-                return ListTile(
-                  leading: const Icon(Icons.home),
-                  title: Text(friendlyName),
-                  subtitle: Text('IP: $ip Port: $port'),
-                  trailing: IconButton(
-                      onPressed: () {
-                        context.goNamed('qrcamera',
-                            pathParameters: {'haurl': url});
-                      },
-                      icon: const Icon(Icons.navigate_next)),
-                );
-              }),
+          : SizedBox(
+              height: 200.0,
+              child: ListView.builder(
+                  itemCount: _haInstances.length,
+                  itemBuilder: (context, index) {
+                    String friendlyName = _haInstances[index].name;
+                    String ip = _haInstances[index].ip!;
+                    String port = _haInstances[index].port.toString();
+                    String url = _haInstances[index].attributes!['base_url']!;
+                    return ListTile(
+                      leading: const Icon(Icons.home),
+                      title: Text(friendlyName),
+                      subtitle: Text('IP: $ip Port: $port'),
+                      trailing: IconButton(
+                          onPressed: () {
+                            context.goNamed('qrcamera',
+                                pathParameters: {'haurl': url});
+                          },
+                          icon: const Icon(Icons.navigate_next)),
+                    );
+                  }),
+            ),
     );
   }
 }

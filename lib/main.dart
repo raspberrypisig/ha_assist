@@ -176,7 +176,12 @@ class _MyHomePageState extends State<MyHomePage> {
                             foregroundColor: Colors.black,
                           ),
                           onPressed: () {
-                            context.pushNamed('ha');
+                            if (apiAvailable) {
+                              BlocProvider.of<HAConnectionBloc>(context)
+                                  .add(DisconnectConnection());
+                            } else {
+                              context.pushNamed('ha');
+                            }
                           },
                           child: Text(
                             text,

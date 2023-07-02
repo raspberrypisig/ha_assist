@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:bonsoir/bonsoir.dart';
 import 'package:flutter/foundation.dart';
-//import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ha_assist/harestapi.dart';
 import 'package:ha_assist/models.dart';
 import 'package:ha_assist/repository.dart';
@@ -19,6 +18,7 @@ class HAConnectionBloc extends HydratedBloc<ConnectionStatusEvent, HAState> {
     on<TokenFound>(_onTokenFound);
     on<HATalk>(_onHATalk);
     on<FindHAInstancesEvent>(_onFindHAInstances);
+    on<DisconnectConnection>(_onDisconnectionConnection);
   }
 
   FutureOr<void> _onConnectionsPageLoad(
@@ -82,5 +82,11 @@ class HAConnectionBloc extends HydratedBloc<ConnectionStatusEvent, HAState> {
     final ids = <ConnectionDetails>{};
     previous.retainWhere((x) => ids.add(x));
     return {'previous': jsonEncode(previous)};
+  }
+
+  FutureOr<void> _onDisconnectionConnection(
+      DisconnectConnection event, Emitter<HAState> emit) {
+    state.connection = null;
+    emit(state.clone());
   }
 }

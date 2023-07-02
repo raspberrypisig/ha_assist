@@ -23,6 +23,8 @@ class HATalk extends ConnectionStatusEvent {
   HATalk(this.message);
 }
 
+class DisconnectConnection extends ConnectionStatusEvent {}
+
 class DiscoveredEvent {}
 
 class NewlyDiscoveredEvent extends DiscoveredEvent {}
