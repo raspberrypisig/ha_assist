@@ -18,16 +18,16 @@ class MockHADiscoveredRepository extends Fake
 
 void main() {
   group("Opening screen test", () {
-    setUpAll(() {});
+    late MockHAConnectionBloc bloc;
 
-    testWidgets('Opening screen: HA disconnected and mic is off',
+    setUpAll(() {
+      bloc = MockHAConnectionBloc(MockHADiscoveredRepository());
+    });
+
+    testWidgets('When program is first opened, HA disconnected and mic is off',
         (tester) async {
-      final MockHAConnectionBloc bloc =
-          MockHAConnectionBloc(MockHADiscoveredRepository());
-
       whenListen(bloc, Stream.fromIterable([HAState()]),
           initialState: HAState());
-
       await tester.pumpWidget(BlocProvider<HAConnectionBloc>(
         create: (context) => bloc,
         child: const MaterialApp(
@@ -39,6 +39,28 @@ void main() {
           findsOneWidget);
       expect(find.text("HA Connected"), findsNothing);
       expect(find.text("HA Disconnected"), findsOneWidget);
+      expect(find.byType(FloatingActionButton), findsOneWidget);
+      expect(find.widgetWithIcon(FloatingActionButton, Icons.mic_none),
+          findsOneWidget);
+    });
+
+    testWidgets("HA has valid connection", (tester) async {
+      whenListen(
+          bloc,
+          Stream.fromIterable([
+            HAState(
+                connection: ConnectionDetails("http://localhost:8123", "abcd"))
+          ]),
+          initialState: HAState());
+      await tester.pumpWidget(BlocProvider<HAConnectionBloc>(
+        create: (context) => bloc,
+        child: const MaterialApp(
+          home: MainScreen(),
+        ),
+      ));
+      await tester.pumpAndSettle();
+      expect(find.text("HA Connected"), findsOneWidget);
+      expect(find.text("HA Disconnected"), findsNothing);
     });
   });
 }
